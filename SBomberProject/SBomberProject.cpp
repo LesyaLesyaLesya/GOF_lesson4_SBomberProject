@@ -14,8 +14,11 @@ int main(void)
 {
     auto logger = std::make_shared<MyTools::ProxyLogger>(MyTools::FileLoggerSingleton::getInstance());
     logger->OpenLogFile("log.txt");
+   
+    auto collDetector = std::make_unique<CollisionDetector>();
+   // std::unique_ptr<CollisionDetectorImpl> collDetector (new CollisionDetector(d));
 
-    SBomber game{logger};
+    SBomber game{logger, collDetector};
 
     do {
         game.TimeStart();

@@ -10,7 +10,7 @@ class HouseBuilderB;
 class House : public DestroyableGroundObject
 {
 public:
-
+	House();
 	bool __fastcall isInside(double x1, double x2) const override;
 
 	inline uint16_t GetScore() const override { return score; }
@@ -20,7 +20,7 @@ public:
 	friend HouseBuilderA;
 	friend HouseBuilderB;
 private:
-	char look[7][14];
+	char look[14][7];
 	const uint16_t score = 40;
 };
 
@@ -47,34 +47,10 @@ class HouseBuilderA : public HouseBuilder
 {
 public:
 	void createHouse() { p = new House; }
-	void buildFoundation()
-	{
-		for (int i = 0; i < 7; i++)
-		{
-			p->look[i][13] = '@';
-		}
-	};
-	void buildWall()
-	{
-		for (int j = 7; j < 13; j++)
-		{
-			p->look[0][j] = '@';
-			p->look[6][j] = '@';
-		}
-	};
-	void buildCeiling()
-	{
-		for (int i = 0; i < 7; i++)
-		{
-			p->look[i][7] = '@';
-		}
-	};
-	void buildRoof()
-	{
-		for (int i = 1; i < 6; i++) { p->look[i][6] = '@'; }
-		for (int i = 2; i < 5; i++) { p->look[i][5] = '@'; }
-
-	};
+	void buildFoundation();
+	void buildWall();
+	void buildCeiling();
+	void buildRoof();
 
 	/*void buildInfantryman() { p->vi.push_back(Infantryman()); }
 	void buildArcher() { p->va.push_back(Archer()); }
@@ -87,17 +63,11 @@ class HouseBuilderB : public HouseBuilder
 {
 public:
 	void createHouse() { p = new House; }
-	void buildFoundation()
-	{
-		for (int i = 0; i < 6; i++)
-		{
-			p->look[i][13] = '@';
-		}
-	};
-	void buildWall() {};
-	void buildCeiling() {};
-	void buildRoof() {};
-	void buildPipe() {};
+	void buildFoundation();
+	void buildWall();
+	void buildCeiling();
+	void buildRoof();
+	void buildPipe();
 };
 
 // Класс-распорядитель, поэтапно создающий дома

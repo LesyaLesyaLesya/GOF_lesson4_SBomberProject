@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <utility>
 #include <stdexcept>
+#include <iostream>
 
 #include "SBomber.h"
 #include "Bomb.h"
@@ -13,7 +14,7 @@
 using namespace std;
 using namespace MyTools;
 
-SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger)
+SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger, std::unique_ptr<CollisionDetectorImpl> collDetector)
     : exitFlag(false),
     startTime(0),
     finishTime(0),
@@ -22,17 +23,22 @@ SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger)
     fps(0),
     bombsNumber(10),
     score(0),
-    logger_{std::move(logger)}
+    logger_{std::move(logger)},
+    collDetector_{ std::move(collDetector)}
 {
     if (!logger_) {
         throw std::runtime_error{"logger is nullptr"};
     }
+    if (!collDetector_) {
+        throw std::runtime_error{ "collition Detector is nullptr" };
+    }
+
     logger_->WriteToLog(string(__FUNCTION__) + " was invoked");
 
     Plane* p = new Plane;
     p->SetDirection(1, 0.1);
     p->SetSpeed(4);
-    p->SetPos(5, 10);
+    p->SetPos(5, 5);
     vecDynamicObj.push_back(p);
 
     LevelGUI* pGUI = new LevelGUI;
@@ -53,20 +59,54 @@ SBomber::SBomber(std::shared_ptr<MyTools::ILogger> logger)
     pGr->SetWidth(width - 2);
     vecStaticObj.push_back(pGr);
 
-    /*Tank* pTank = new Tank;
-    pTank->SetWidth(13);
-    pTank->SetPos(30, groundY - 1);
-    vecStaticObj.push_back(pTank);*/
-
-    pTank = new Tank;
+    Tank* pTank = new Tank;
     pTank->SetWidth(13);
     pTank->SetPos(50, groundY - 1);
     vecStaticObj.push_back(pTank);
 
-    House * pHouse = new House;
+    /*pTank = new Tank;
+    pTank->SetWidth(13);
+    pTank->SetPos(30, groundY - 1);
+    vecStaticObj.push_back(pTank);*/
+
+    
+    /*House * pHouse = new House;
     pHouse->SetWidth(13);
     pHouse->SetPos(10, groundY - 1);
-    vecStaticObj.push_back(pHouse);
+    vecStaticObj.push_back(pHouse);*/
+
+    std::cout << "Which house would you like? press 1 (no pipe) or 2 (with pipe)" << std::endl;
+    int houseType;
+    std::cin >> houseType;
+
+    switch (houseType)
+    {
+    case 1:
+    {
+        Director dir;
+        HouseBuilderA hbA;
+
+        House* houseA = dir.createHouse(hbA);
+        houseA->SetPos(10, groundY - 1);
+        vecStaticObj.push_back(houseA);
+
+        break;
+    }
+    case 2:
+    {
+        Director dir;
+        HouseBuilderB hbB;
+
+        House* houseB = dir.createHouse(hbB);
+        houseB->SetPos(10, groundY - 1);
+        vecStaticObj.push_back(houseB);
+    }
+    default:
+        break;
+    }
+
+
+    //House* houseB = dir.createHouse(hbB);
 
     /*
     Bomb* pBomb = new Bomb;
@@ -114,19 +154,19 @@ void SBomber::CheckObjects()
 {
     logger_->WriteToLog(string(__FUNCTION__) + " was invoked");
 
-    CheckPlaneAndLevelGUI();
-    CheckBombsAndGround();
+    collDetector_->CheckPlaneAndLevelGUI(this);
+    collDetector_->CheckBombsAndGround(this);
 };
 
-void SBomber::CheckPlaneAndLevelGUI()
+/*void SBomber::CheckPlaneAndLevelGUI()
 {
     if (FindPlane()->GetX() > FindLevelGUI()->GetFinishX())
     {
         exitFlag = true;
     }
-}
+}*/
 
-void SBomber::CheckBombsAndGround() 
+/*void SBomber::CheckBombsAndGround() 
 {
     vector<Bomb*> vecBombs = FindAllBombs();
     Ground* pGround = FindGround();
@@ -141,9 +181,9 @@ void SBomber::CheckBombsAndGround()
         }
     }
 
-}
+}*/
 
-void SBomber::CheckDestoyableObjects(Bomb * pBomb)
+/*void SBomber::CheckDestoyableObjects(Bomb * pBomb)
 {
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
     const double size = pBomb->GetWidth();
@@ -158,7 +198,7 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
             DeleteStaticObj(vecDestoyableObjects[i]);
         }
     }
-}
+}*/
 
 void SBomber::DeleteDynamicObj(DynamicObject* pObj)
 {
@@ -371,3 +411,16 @@ void SBomber::DropBomb()
         score -= Bomb::BombCost;
     }
 }
+
+
+/*Задача: разгрузить класс SBomber. 
+С помощью шаблона «Мост» вынести в отдельный объект функциональность,
+связанную с проверкой столкновений в игре.
+В классе SBomber есть следующие 3 функции для проверки столкновения объектов:
+void CheckPlaneAndLevelGUI();
+void CheckBombsAndGround();
+void __fastcall CheckDestoyableObjects(Bomb* pBomb);
+Вынесите эту функциональность в класс CollisionDetector, а экземпляр этого класса
+разместите в классе SBomber. Предусмотрите передачу параметров функциям класса
+CollisionDetector, необходимым для работы.
+*/
