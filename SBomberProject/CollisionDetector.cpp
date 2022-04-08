@@ -81,25 +81,4 @@ void __fastcall WinCollisionDetector::CheckDestoyableObjects(Bomb* pBomb, SBombe
     }
 }
 
-void CollisionDetector::CheckPlaneAndLevelGUI(SBomber* sBomber_)
-{   
-        if (impl_) {
-            impl_->CheckPlaneAndLevelGUI(sBomber_);
-        }
-}
-void CollisionDetector::CheckBombsAndGround(SBomber* sBomber_) {
-    if (impl_) {
-        impl_->CheckBombsAndGround(sBomber_);
-    }
-}
-
-void __fastcall CollisionDetector::CheckDestoyableObjects(Bomb* pBomb, SBomber* sBomber_)
-{
-    if (impl_) {
-        impl_->CheckDestoyableObjects(pBomb, sBomber_);
-    }
-}
-
-
-
 
