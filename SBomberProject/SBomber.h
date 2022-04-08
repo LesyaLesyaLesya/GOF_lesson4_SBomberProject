@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <memory>
+#include <stdlib.h>
 
+#include "CollisionDetector.h"
 #include "LevelGUI.h"
 #include "Plane.h"
 #include "Bomb.h"
@@ -12,9 +14,12 @@
 
 class SBomber
 {
+    friend class XCollisionDetector; 
+    friend class CollisionDetectorImpl;
+    friend class WinCollisionDetector;
 public:
 
-    SBomber(std::shared_ptr<MyTools::ILogger> logger);
+    SBomber(std::shared_ptr<MyTools::ILogger> logger, std::unique_ptr<CollisionDetectorImpl> collDetector);
     ~SBomber();
     
     inline bool GetExitFlag() const { return exitFlag; }
@@ -27,20 +32,26 @@ public:
     void MoveObjects();
     void CheckObjects();
 
+    
+protected:
+    
 private:
 
-    void CheckPlaneAndLevelGUI();
-    void CheckBombsAndGround();
-    void __fastcall CheckDestoyableObjects(Bomb* pBomb);
+    
+
+    //void CheckPlaneAndLevelGUI();
+    //void CheckBombsAndGround();
+    //void __fastcall CheckDestoyableObjects(Bomb* pBomb);
 
     void __fastcall DeleteDynamicObj(DynamicObject * pBomb);
     void __fastcall DeleteStaticObj(GameObject* pObj);
 
-    Ground * FindGround() const;
+    std::vector<Bomb*> FindAllBombs() const;
+    Ground* FindGround() const;
     Plane * FindPlane() const;
     LevelGUI * FindLevelGUI() const;
     std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
-    std::vector<Bomb*> FindAllBombs() const;
+    
 
     void DropBomb();
 
@@ -53,4 +64,7 @@ private:
     uint16_t bombsNumber, deltaTime, fps;
     int16_t score;
     std::shared_ptr<MyTools::ILogger> logger_;
+    std::unique_ptr<CollisionDetectorImpl> collDetector_;
+
+
 };
