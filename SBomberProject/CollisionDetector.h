@@ -38,17 +38,3 @@ public:
     void __fastcall CheckDestoyableObjects(Bomb* pBomb, SBomber* sBomber_) override;
 };
 
-class CollisionDetector {
-public:
-    CollisionDetector(std::unique_ptr<CollisionDetectorImpl> impl) : impl_{ std::move(impl) } {}
-    ~CollisionDetector() {};
-
-    void CheckPlaneAndLevelGUI(SBomber* sBomber_);
-
-    void CheckBombsAndGround(SBomber* sBomber_);
-
-    void __fastcall CheckDestoyableObjects(Bomb* pBomb, SBomber* sBomber_);
-
-protected:
-    std::unique_ptr<CollisionDetectorImpl> impl_;
-};
